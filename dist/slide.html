@@ -1,0 +1,76 @@
+<!doctype html><html><head><meta charset=UTF-8><title>调研H5页面在微信中直接呼端 - By imakan</title><link rel=stylesheet href=//cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css><link rel=stylesheet href=//cdn.staticfile.org/prism/1.15.0/themes/prism.min.css><link rel=stylesheet href=//cdn.staticfile.org/KaTeX/0.10.0-rc.1/katex.min.css><link rel=stylesheet href=//cdn.staticfile.org/prism/1.15.0/themes/prism-dark.min.css><link rel=stylesheet href=./css/share.css><link href=css/chunk-vendors.e8e9c54c.css rel=stylesheet></head><body><div><article id=webslides><section slide class="slide bg-black aligncenter" video="//ali.static.yximgs.com/udata/pkg/fe/kwai_video.c8e339ab.mp4 autoplay loop .background.dark"><video autoplay loop muted preload=true class="background-video background-video-background dark"><source src=//ali.static.yximgs.com/udata/pkg/fe/kwai_video.c8e339ab.mp4></video><div class=wrap wrap=true><h1 class="text-landing text-subtitle text-shadow animated fadeInRight">open app</h1><p class="text-intro animated fadeInUp delay-800">统一唤起快手app的开发工具包</p><p><a href=https://npm.corp.kuaishou.com/-/web/detail/@ks/web-util class="button ghost animated flipInX delay-1500" target=_blank><i class="fa fa-gitlab"></i> web-util</a></p></div></section><section slide class="slide no2-content bg-black aligncenter" image="https://source.unsplash.com/C1HhAQrbykQ/ .dark"><span class="background dark" style="background-image:url('https://source.unsplash.com/C1HhAQrbykQ/')"></span><div class=wrap wrap=true><h3 class="text-landing text-shadow">应用场景</h3><ul class=flexblock><li><span class="testContent animated fadeInDown">假装在微信中打开的</span><div class="teslaContenWrap animated bounceIn delay-300"><img src=/img/iphone.png alt="" class=iphone><iframe src="http://auto.chenzhongtech.com/auto/teslaCommunity?fromHome=1&layoutType=4&source=unknown&inter_source=brand_list" class=teslaconten scrolling=auto></iframe></div></li><li><div class="animated tobuild flipInX"><span class=testContent>假装在微信中分享了</span><div class=teslaContenWrap><img src=/img/iphone.png alt="" class=iphone> <img src=/img/tesladialog.png alt="" class=tesladialog></div></div></li><li><div class="animated tobuild fadeInRight"><span class=testContent>最终在快手中打开了</span><div class=teslaContenWrap><img src=/img/iphone.png alt="" class=iphone><iframe src="http://t.chenzhongtech.com/auto/teslaCommunity?fromHome=1&layoutType=4&source=unknown&inter_source=brand_list" class=teslaconten scrolling=auto></iframe></div></div></li></ul></div></section><section slide class="slide no3-content bg-black aligncenter" image="https://source.unsplash.com/C1HhAQrbykQ/ .dark"><span class="background dark" style="background-image:url('https://source.unsplash.com/C1HhAQrbykQ/')"></span><div class=wrap wrap=true><h1 class="text-shadow animated lightSpeedIn"><span>原理</span><a href=http://git.corp.kuaishou.com/ks-ad/ad-fe/web-util/blob/master/src/open-app/index.js#L123 target=_blank>open-app</a></h1><p class="text-intro animated fadeInUp delay-800">微信6.5.16以上提供了白名单通道, 可以直接唤起app</p><pre style="font-size:13px;width:80%;margin:0 auto;" class="tobuild fadeInUp language-javascript"><code style="font-size:13px;width:80%;margin:0 auto;" class=language-javascript><span class="token comment">// 微信6.5.16以上提供了白名单通道, 可以直接唤起app</span>
+<span class="token keyword">var</span> wxMatch <span class="token operator">=</span> <span class="token regex">/ MicroMessenger\/([0-9.]+)/</span><span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span>navigator<span class="token punctuation">.</span>userAgent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>wxMatch <span class="token operator">&amp;&amp;</span> config<span class="token punctuation">.</span>wxAppId <span class="token operator">&amp;&amp;</span> util<span class="token punctuation">.</span><span class="token function">isGteVersion</span><span class="token punctuation">(</span>wxMatch<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">'6.5.16'</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">wxAsyncReady</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">res</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>res<span class="token punctuation">.</span>result <span class="token operator">===</span> <span class="token number">1</span> <span class="token operator">&amp;&amp;</span> res<span class="token punctuation">.</span>appId <span class="token operator">===</span> config<span class="token punctuation">.</span>wxAppId<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment">// 参数 parameter 是唤起之后，app 内打开的路径。通过 schemeUrl 截取，例：home?from=abc</span>
+            res<span class="token punctuation">.</span>wx<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>
+                <span class="token string">'launchApplication'</span><span class="token punctuation">,</span>
+                <span class="token punctuation">{</span>
+                    appID<span class="token punctuation">:</span> config<span class="token punctuation">.</span>wxAppId<span class="token punctuation">,</span>
+                    parameter<span class="token punctuation">:</span> formattedUrlObj<span class="token punctuation">.</span>schemeUrl<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span>
+                        formattedUrlObj<span class="token punctuation">.</span>schemeUrl<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">'://'</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">3</span>
+                    <span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token punctuation">}</span><span class="token punctuation">,</span>
+                <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">res</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>res<span class="token punctuation">.</span>err_msg <span class="token operator">!==</span> <span class="token string">'launchApplication:ok'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        config<span class="token punctuation">.</span>needDownLoad <span class="token operator">&amp;&amp;</span> <span class="token function">openOrDownLoadApp</span><span class="token punctuation">(</span>config<span class="token punctuation">,</span> formattedUrlObj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                        <span class="token function">sendLog</span><span class="token punctuation">(</span>
+                            logType<span class="token punctuation">.</span><span class="token constant">APP_WECHAT_WHITELIST_SUCCESS</span><span class="token punctuation">,</span>
+                            config<span class="token punctuation">.</span>position<span class="token punctuation">,</span>
+                            config<span class="token punctuation">.</span>appCode
+                        <span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            config<span class="token punctuation">.</span>needDownLoad <span class="token operator">&amp;&amp;</span> <span class="token function">openOrDownLoadApp</span><span class="token punctuation">(</span>config<span class="token punctuation">,</span> formattedUrlObj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token function">openOrDownLoadApp</span><span class="token punctuation">(</span>config<span class="token punctuation">,</span> formattedUrlObj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre></div></section><section slide class="slide no4-content bg-black" image=https://source.unsplash.com/n9WPPWiPPJw/ ><span class=background style="background-image:url('https://source.unsplash.com/n9WPPWiPPJw/')"></span><div class=wrap wrap=true><h1 class="text-landing text-subtitle text-shadow aligncenter animated lightSpeedIn"><span>结论</span></h1><div class="content-left tobuild animated fadeInRight"><ul><li>配置项</li></ul><pre style=font-size:13px;height:300px; class="fadeInUp slow language-javascript"><code style=font-size:13px;height:300px; class=language-javascript><span class="token punctuation">{</span>
+    adidDownloadUrl<span class="token punctuation">:</span> <span class="token string">"https://promotion-partner.kuaishou.com/rest/n/promotion/p"</span>
+    appCode<span class="token punctuation">:</span> <span class="token string">"KWAI"</span>
+    appName<span class="token punctuation">:</span> <span class="token string">"快手"</span>
+    appStore<span class="token punctuation">:</span> <span class="token string">"https://itunes.apple.com/app/apple-store/id440948110?pt=572643&amp;mt=8"</span>
+    appid<span class="token punctuation">:</span> <span class="token string">"100228415"</span>
+    defaultUniversalLinkUrl<span class="token punctuation">:</span> <span class="token string">"https://m.ssl.kuaishou.com/app/"</span>
+    downloadStatus<span class="token punctuation">:</span> <span class="token string">"undownload"</span>
+    downloadUrl<span class="token punctuation">:</span> <span class="token string">"https://m.viviv.com/download/kwai"</span>
+    extraParam<span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    installStatus<span class="token punctuation">:</span> <span class="token number">0</span>
+    mainPage<span class="token punctuation">:</span> <span class="token string">"https://www.kuaishou.com"</span>
+    marketUrl<span class="token punctuation">:</span> <span class="token string">"market://details?id=com.smile.gifmaker"</span>
+    needDownLoad<span class="token punctuation">:</span> <span class="token boolean">true</span>
+    packageName<span class="token punctuation">:</span> <span class="token string">"com.smile.gifmaker"</span>
+    position<span class="token punctuation">:</span> <span class="token string">"打开快手App"</span>
+    query<span class="token punctuation">:</span> <span class="token punctuation">{</span>fromHome<span class="token punctuation">:</span> <span class="token string">"1"</span><span class="token punctuation">,</span> layoutType<span class="token punctuation">:</span> <span class="token string">"4"</span><span class="token punctuation">,</span> source<span class="token punctuation">:</span> <span class="token string">"unknown"</span><span class="token punctuation">,</span> inter_source<span class="token punctuation">:</span> <span class="token string">"brand_list"</span><span class="token punctuation">,</span> title<span class="token punctuation">:</span> <span class="token string">"特斯拉"</span><span class="token punctuation">}</span>
+    schemeUrl<span class="token punctuation">:</span> <span class="token string">"kwai://work/3xib9qszf88eh4s?userId=212774567"</span>
+    shouldOpenInBrowserDialog<span class="token punctuation">:</span> <span class="token boolean">false</span>
+    sys<span class="token punctuation">:</span> <span class="token punctuation">{</span>android<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span> ios<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span>
+    useUniversalLink<span class="token punctuation">:</span> <span class="token boolean">true</span>
+    wxAppId<span class="token punctuation">:</span> <span class="token string">"wx9227d48257374438"</span>
+    wxRequestUrl<span class="token punctuation">:</span> <span class="token string">"/rest/wd/wemedia/signShareUrl"</span>
+    yingyongbao<span class="token punctuation">:</span> <span class="token string">"http://a.app.qq.com/o/simple.jsp?pkgname=com.smile.gifmaker&amp;g_f=99"</span>
+<span class="token punctuation">}</span>
+</code></pre></div><div class="content-right tobuild animated fadeInRight"><ul><li>新增白名单域名 <a href=https://kngx.corp.kuaishou.com/location/manage target=_blank>kngx</a><ul><li><strong>viviv.com</strong></li><li><strong>kuai-fei</strong></li><li><strong>chenzhongtech.com</strong></li><li><strong>m.etoote.com</strong></li></ul></li></ul><hr><ul><li onclick="launchApp('kim')">对接人：<a href=javascript:void(0)><code>徐明</code></a></li></ul></div><hr><div class="content-conten tobuild animated fadeInRight"><ul><li><a href="https://wiki.corp.kuaishou.com/pages/viewpage.action?pageId=264694894" target=_blank>动态域名</a>：https:://wiki.corp.kuaishou.com/pages/viewpage.action?pageId=264694894</li></ul></div></div></section></article></div><script src=./js/share.js></script><script>window.pluginsOptions = {}
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    let isPrintMode = false;
+    if(~location.search.indexOf('print-pdf')){
+        isPrintMode = true;
+        WebSlides.registerPlugin('scroll', function(){});
+    }
+    const ws = new WebSlides({
+        loop: false
+    })
+    window.wsInstance = ws;
+    if(isPrintMode){
+        ws.slides.forEach(s=>s.show())
+    }
+}, false)</script><script src=js/chunk-vendors.499f8567.js></script><script src=js/slide.eda8e627.js></script></body></html>
